@@ -8,5 +8,4 @@ public class Event {
 	private String recurring;
 	private String type;
 	private List<String> invitedPeople;
-	
 }

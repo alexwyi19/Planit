@@ -1,13 +1,11 @@
 
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
@@ -18,6 +16,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import objects.Event;
 import objects.User;
@@ -52,17 +52,7 @@ public class Server
 			fbAuth = FirebaseAuth.getInstance(fbApp);
 			// Get access to Firebase Realtime Database
 			fbDatabase = FirebaseDatabase.getInstance(fbApp);
-			InetAddress ip;
-			  try {
-
-				ip = InetAddress.getLocalHost();
-				System.out.println("Current IP address : " + ip.getHostAddress());
-
-			  } catch (UnknownHostException e) {
-
-				e.printStackTrace();
-
-			  }
+			
 			while (true) 
 			{
 				Socket s = ss.accept();
@@ -151,108 +141,116 @@ public class Server
 	}
 }
 
-//class ClientHandler extends Thread
-//{
-//	private Server server;
-//	private Socket socket;
-//	private DataOutputStream out;
-//	private DataInputStream in;
-//	
-//	public ClientHandler(Socket socket, Server server) 
-//	{
-//		out = null;
-//		in = null;
-//		this.server = server;
-//		this.socket = socket;
-//		try
-//		{
-//			out = new DataOutputStream(socket.getOutputStream());
-//			in = new DataInputStream(socket.getInputStream());
-//			this.start();
-//		}
-//		catch (IOException ioe) 
-//		{
-//			System.out.println("in clienthandler constructor " + ioe.getMessage());
-//		}
-//			
-//	}
-//	
-//	public void run() 
-//	{
-//		while (true) 
-//		{
-//			try 
-//			{
-//				// Get JSON string from client
-//				String fromClient = in.readUTF();
-//				// Parse JSON string to object
-//				Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//				Event event = gson.fromJson(fromClient, Event.class);
-//			} 
-//			catch (IOException ioe) 
-//			{
-//				System.out.println("in clienthandler.run() " + ioe.getMessage());
-//			}
-//			// Json object
-//			// jsondata = new JSONObject()
-//			// somestring = jsondata.getString()
-//			// somestring.equals("request_connect") 
-//			// logic here
-//		}
-//		
-//	}
-//
-//	/* 
-//	 *  Send message to client function
-//	 */
-//	
-//}
-
-
-class ClientHandler extends Thread {
-
-	//private PrintWriter pw;
-	//private BufferedReader br;
-	private ObjectOutputStream oos;
-	private ObjectInputStream ois;
+class ClientHandler extends Thread
+{
 	private Server server;
-	public ClientHandler(Socket s, Server server) {
-		try {
-			this.server = server;
-			oos = new ObjectOutputStream(s.getOutputStream());
-			ois = new ObjectInputStream(s.getInputStream());
+	private Socket socket;
+	private DataOutputStream out;
+	private DataInputStream in;
+	
+	public ClientHandler(Socket socket, Server server) 
+	{
+		out = null;
+		in = null;
+		this.server = server;
+		this.socket = socket;
+		try
+		{
+			out = new DataOutputStream(socket.getOutputStream());
+			in = new DataInputStream(socket.getInputStream());
 			this.start();
-		} catch (IOException ioe) {
-			System.out.println("ioe in ServerThread constructor: " + ioe.getMessage());
 		}
+		catch (IOException ioe) 
+		{
+			System.out.println("in clienthandler constructor " + ioe.getMessage());
+		}
+			
+	}
+	
+	public void run() 
+	{
+		while (true) 
+		{
+			try 
+			{
+				// TODO : Need a way to differentiate between when client
+				// sends create user info
+				
+				
+				// TODO : Need a way to differentiate between when client
+				// sends create event info
+				
+				
+				// TODO : Need a way to differentiate between when client
+				// sends update event info
+				
+				
+				// TODO : Need a way to differentiate between when client
+				// sends any other kind of json info
+				
+				// Right now, this just gets a JSON object that is parsed as
+				// a user
+				String fromClient = in.readUTF();
+				// Parse JSON string to object
+				Gson gson = new GsonBuilder().setPrettyPrinting().create();
+				User user = gson.fromJson(fromClient, User.class);
+				// test message
+				System.out.println("inside clienthandler run() " + 
+						user.getEmail() + " " + user.getPassword()
+						+ " " + user.getName());
+				
+				// Create the user
+				server.createUser(user.getEmail(), user.getPassword(), user.getName());
+				//Event event = gson.fromJson(fromClient, Event.class);
+			} 
+			catch (IOException ioe) 
+			{
+				System.out.println("in clienthandler.run() " + ioe.getMessage());
+			}
+			// Json object
+			// jsondata = new JSONObject()
+			// somestring = jsondata.getString()
+			// somestring.equals("request_connect") 
+			// logic here
+		}
+		
 	}
 
-	//public void sendMessage(String message) {
-//	public void sendMessage(ChatMessage cm) {
+	/* 
+	 *  Send message to client function
+	 */
+	
+}
+
+
+//class ClientHandler extends Thread {
+//	private ObjectOutputStream oos;
+//	private ObjectInputStream ois;
+//	private Server server;
+//	public ClientHandler(Socket s, Server server) {
 //		try {
-//			oos.writeObject(cm);
-//			oos.flush();
+//			this.server = server;
+//			oos = new ObjectOutputStream(s.getOutputStream());
+//			ois = new ObjectInputStream(s.getInputStream());
+//			this.start();
 //		} catch (IOException ioe) {
-//			System.out.println("ioe: " + ioe.getMessage());
+//			System.out.println("ioe in ServerThread constructor: " + ioe.getMessage());
 //		}
 //	}
-	
-	public void run() {
-		try {
-			while(true) {
-				//String line = br.readLine();
-				//cr.broadcast(line, this);
-				//ChatMessage cm = (ChatMessage)ois.readObject();
-				User user = (User)ois.readObject();
-				System.out.println("inside clienthandler run() " + 
-				user.getEmail() + " " + user.getPassword()
-				+ " " + user.getName());
-				server.createUser(user.getEmail(), user.getPassword(), user.getName());
-			}
-		} catch (IOException ioe) {
-			System.out.println("ioe in ServerThread.run(): " + ioe.getMessage());
-		} catch (ClassNotFoundException cnfe) {
-			System.out.println("cnfe: " + cnfe.getMessage());
-		}
-	}
-}
+//	
+//	public void run() {
+//		try {
+//			while(true) {
+//				User user = (User)ois.readObject();
+//				System.out.println("inside clienthandler run() " + 
+//				user.getEmail() + " " + user.getPassword()
+//				+ " " + user.getName());
+//				server.createUser(user.getEmail(), user.getPassword(), user.getName());
+//			}
+//		} catch (IOException ioe) {
+//			System.out.println("ioe in ServerThread.run(): " + ioe.getMessage());
+//		} catch (ClassNotFoundException cnfe) {
+//			System.out.println("cnfe: " + cnfe.getMessage());
+//		}
+//	}
+//}
