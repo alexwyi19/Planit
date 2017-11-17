@@ -173,21 +173,6 @@ class ClientHandler extends Thread
 		{
 			try 
 			{
-				// TODO : Need a way to differentiate between when client
-				// sends create user info
-				
-				
-				// TODO : Need a way to differentiate between when client
-				// sends create event info
-				
-				
-				// TODO : Need a way to differentiate between when client
-				// sends update event info
-				
-				
-				// TODO : Need a way to differentiate between when client
-				// sends any other kind of json info
-				
 				// Right now, this just gets a JSON object that is parsed as
 				// a user
 				String fromClient = in.readUTF();
@@ -201,6 +186,26 @@ class ClientHandler extends Thread
 				
 				// Create the user
 				server.createUser(user.getEmail(), user.getPassword(), user.getName());
+				
+				// TODO : Need a way to differentiate between when client
+				// sends create user info
+				if (fromClient.contains("username"))
+				{
+					
+				}
+				
+				// TODO : Need a way to differentiate between when client
+				// sends create event info
+				
+				
+				// TODO : Need a way to differentiate between when client
+				// sends update event info
+				
+				
+				// TODO : Need a way to differentiate between when client
+				// sends any other kind of json info
+				
+				
 				//Event event = gson.fromJson(fromClient, Event.class);
 			} 
 			catch (IOException ioe) 
