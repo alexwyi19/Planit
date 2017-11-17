@@ -1,11 +1,12 @@
-package java;
+
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.objects.User;
 import java.util.Scanner;
+
+import objects.User;
 
 public class ClientTest extends Thread {
 
