@@ -11,12 +11,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class Server {
-	private static final String DATABASE_URL = "https://firstfirebase-f9ec6.firebaseio.com/";
-
+//	private static final String DATABASE_URL = "https://firstfirebase-f9ec6.firebaseio.com/";
+	private static final String DATABASE_URL = "https://planit-ea426.firebaseio.com/";
     private static DatabaseReference database;
     
 	public static void main (String[] args) throws IOException {
-		FileInputStream serviceAccount = new FileInputStream("planitaccount2.json");
+		FileInputStream serviceAccount = new FileInputStream("planitaccount.json");
 
 		FirebaseOptions options = new FirebaseOptions.Builder()
 		  .setCredentials(GoogleCredentials.fromStream(serviceAccount))
