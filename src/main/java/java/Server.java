@@ -6,6 +6,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.objects.Event;
+import java.objects.User;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
@@ -16,9 +18,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
 import com.google.firebase.database.FirebaseDatabase;
-
-import objects.Event;
-import objects.User;
 
 public class Server 
 {
