@@ -6,13 +6,24 @@ public class User implements Serializable{
 	public static final long serialVersionUID = 1;
 	private String email;
 	private String password;
-	private String username;
+	private String userName;
+	
+	public User()
+	{
+		email = null;
+		password = null;
+		userName = null;
+	}
+	public User(String email, String password) {
+		this.email = email;
+		this.password = password;
+	}
 	
 	public User(String email, String password, String username) 
 	{
 		this.email = email;
 		this.password = password;
-		this.username = username;
+		this.userName = username;
 	}
 	
 	public String getEmail()
@@ -25,8 +36,8 @@ public class User implements Serializable{
 		return password;
 	}
 	
-	public String getName()
+	public String getUserName()
 	{
-		return username;
+		return userName;
 	}
 }

@@ -31,5 +31,6 @@ dependencies {
     // Firebase Java SDK
     compile 'com.google.firebase:firebase-admin:5.5.0'
     compile "org.slf4j:slf4j-simple:1.7.9"
+    
 }
 

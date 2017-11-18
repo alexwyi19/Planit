@@ -46,10 +46,11 @@ public class ClientTest extends Thread {
 				JSONObject jo = new JSONObject();
 				jo.put("email", email);
 				jo.put("password", password);
-				jo.put("username", username);
+				jo.put("userName", username);
 				String jsonString = jo.toString();
 				out.writeUTF(jsonString);
 				System.out.println("Created user object and sent");
+				
 			}
 			
 		} catch (IOException ioe) {
