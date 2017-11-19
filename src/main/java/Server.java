@@ -11,12 +11,10 @@ import java.util.Vector;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -119,6 +117,29 @@ public class Server
 	}
 	
 	/*
+	 *  Verify user login credentials
+	 */
+	public void verifyUser(User user)
+	{
+		String username = user.getUserName();
+		String password = user.getPassword();
+		System.out.println("verifying user: " + username + " password: " + password);
+		if (userExists(username))
+		{
+			User u = getUser(user);
+			if (u.getPassword().equals(password))
+			{
+				System.out.println("Verifying: " + username + " w/ given password: " + password);
+				System.out.println("GOOD LOGIN INFO");
+			}
+			else if (!(u.getPassword().equals(password)))
+			{
+				System.out.println("BAD LOGIN INFO");
+			}
+		}
+	}
+	
+	/*
 	 *  Create a user function. Sends to Realtime Database
 	 */
 	public void createUser(User user) 
@@ -181,8 +202,13 @@ public class Server
 	 */
 	public User getUser(User user)
 	{
-		return null;
-
+		String username = user.getUserName();
+		User u = null;
+		if (userExists(username))
+		{
+			u = users.child(username).getValue(User.class);
+		}
+		return u;
 	}
 		
 	/*
@@ -205,7 +231,8 @@ class ClientHandler extends Thread
 	private Socket socket;
 	private DataOutputStream out;
 	private DataInputStream in;
-	
+//	private BufferedReader in;
+//	private PrintWriter out;
 	public ClientHandler(Socket socket, Server server) 
 	{
 		out = null;
@@ -216,6 +243,9 @@ class ClientHandler extends Thread
 		{
 			out = new DataOutputStream(socket.getOutputStream());
 			in = new DataInputStream(socket.getInputStream());
+			//out = new PrintWriter(socket.getOutputStream());
+			//in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			
 			this.start();
 		}
 		catch (IOException ioe) 
@@ -233,6 +263,11 @@ class ClientHandler extends Thread
 			{
 				// Right now, this just gets a JSON string
 				String fromClient = in.readUTF();
+				//String fromClient = in.readLine();
+				if (fromClient != null) {
+					System.out.println("FromClient: " + fromClient);
+				}
+				
 				// Parse JSON string to object
 				Gson gson = new GsonBuilder().setPrettyPrinting().create();
 				User user = gson.fromJson(fromClient, User.class);
@@ -241,17 +276,20 @@ class ClientHandler extends Thread
 						user.getEmail() + " " + user.getPassword()
 						+ " " + user.getUserName());
 				
+				// Test to see if login credentials are right.
+				server.verifyUser(user);
 				// Create user object and send to server. Server will do the
 				// logic to create a user
-				server.createUser(user);
+				//server.createUser(user);
+				
 				//server.createUser(user.getEmail(), user.getPassword(), user.getName());
 				
-				// TODO : Need a way to differentiate between when client
-				// sends create user info
-				if (fromClient.contains("username"))
-				{
-					
-				}
+//				// TODO : Need a way to differentiate between when client
+//				// sends create user info
+//				if (fromClient.contains("username"))
+//				{
+//					
+//				}
 				
 				// TODO : Need a way to differentiate between when client
 				// sends create event info
@@ -270,6 +308,7 @@ class ClientHandler extends Thread
 			catch (IOException ioe) 
 			{
 				System.out.println("in clienthandler.run() " + ioe.getMessage());
+				ioe.printStackTrace();
 			}
 			// Json object
 			// jsondata = new JSONObject()
