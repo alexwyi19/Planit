@@ -1,8 +1,3 @@
-/Server$1.class
-/ClientHandler.class
-/ClientTest.class
-/java/
 /objects/
-/Server$2.class
-/Server$3.class
-/Server$4.class
+/DateDeserializer.class
+/DateSerializer.class

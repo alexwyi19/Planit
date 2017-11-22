@@ -6,11 +6,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserRecord;
+import com.google.firebase.auth.UserRecord.CreateRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,7 +29,11 @@ import com.google.gson.GsonBuilder;
 
 import objects.Event;
 import objects.User;
-
+/*
+ * Server class to accept multithreaded sockets. Uses 
+ * ClientHandler class within this file to communicate with 
+ * each socket
+ */
 public class Server 
 {
 	private static final String DATABASE_URL = "https://planit-ea426.firebaseio.com/";
@@ -29,13 +41,17 @@ public class Server
 	private ServerSocket ss;
 	private Vector<ClientHandler> clientHandlers;
 	private FirebaseApp fbApp;
-	//private FirebaseAuth fbAuth;
+	private FirebaseAuth fbAuth;
 	private FirebaseDatabase fbDatabase;
 	private DatabaseReference emailsRef;
 	private DatabaseReference usersRef;
+	private DatabaseReference eventsRef;
 	private DataSnapshot emails;
 	private DataSnapshot users;
-	
+	private DataSnapshot events;
+	/*
+	 * Server constructor
+	 */
 	public Server() 
 	{
 		ss = null;
@@ -53,7 +69,7 @@ public class Server
 	
 			fbApp = FirebaseApp.initializeApp(options);
 			// Get access to Firebase Auth for users
-			// fbAuth = FirebaseAuth.getInstance(fbApp);
+			fbAuth = FirebaseAuth.getInstance(fbApp);
 			// Get access to Firebase Realtime Database
 			fbDatabase = FirebaseDatabase.getInstance(fbApp);
 
@@ -114,6 +130,19 @@ public class Server
 		        System.out.println("The read failed: " + databaseError.getCode());
 		    }
 		});
+		
+		eventsRef = fbDatabase.getReference("events");
+		eventsRef.addValueEventListener(new ValueEventListener() {
+		    @Override
+		    public void onDataChange(DataSnapshot dataSnapshot) {
+		        events = dataSnapshot;
+		    }
+
+		    @Override
+		    public void onCancelled(DatabaseError databaseError) {
+		        System.out.println("The read failed: " + databaseError.getCode());
+		    }
+		});
 	}
 	
 	/*
@@ -121,7 +150,7 @@ public class Server
 	 */
 	public void verifyUser(User user)
 	{
-		String username = user.getUserName();
+		String username = user.getName();
 		String password = user.getPassword();
 		System.out.println("verifying user: " + username + " password: " + password);
 		if (userExists(username))
@@ -137,6 +166,10 @@ public class Server
 				System.out.println("BAD LOGIN INFO");
 			}
 		}
+		else if (!userExists(username))
+		{
+			System.out.println("USER DOESNT EXIST");
+		}
 	}
 	
 	/*
@@ -145,13 +178,14 @@ public class Server
 	public void createUser(User user) 
 	{
 		String email = encodeUserEmail(user.getEmail());
-		String username = user.getUserName();
+		String username = user.getName();
 		System.out.println("Creating: " + email + " " + username);
 		
 		if (!emailExists(email) && !userExists(username))
 		{
 			emailsRef.child(email).setValueAsync(email);
 			usersRef.child(username).setValueAsync(user);
+			createUserFbAuth(user);
 		}
 		else 
 		{
@@ -187,14 +221,14 @@ public class Server
 	/*
 	 *  Firebase doesn't allow adding '.' in keys so encode the '.' 
 	 */
-	static String encodeUserEmail(String userEmail) {
-	    return userEmail.replace(".", ",");
+	static String encodeUserEmail(String email) {
+	    return email.replace(".", ",");
 	}
 	/*
 	 *  Decode the ',' from email string
 	 */
-	static String decodeUserEmail(String userEmail) {
-	    return userEmail.replace(",", ".");
+	static String decodeUserEmail(String email) {
+	    return email.replace(",", ".");
 	}
 	
 	/*
@@ -202,7 +236,7 @@ public class Server
 	 */
 	public User getUser(User user)
 	{
-		String username = user.getUserName();
+		String username = user.getName();
 		User u = null;
 		if (userExists(username))
 		{
@@ -210,13 +244,63 @@ public class Server
 		}
 		return u;
 	}
+	/*
+	 * Create user in FB AUTH database, TESTING THIS
+	 */
+	public void createUserFbAuth(User user)
+	{
+		String email = user.getEmail();
+		String password = user.getPassword();
+		String username = user.getName();
+		System.out.println("Creating user in FBAUTH: " + 
+				email + " w/ password: " + password);
+		CreateRequest request = new CreateRequest()
+				.setEmail(email)
+				.setPassword(password)
+				.setDisplayName(username)
+				.setDisabled(false);
 		
+		UserRecord userRecord = null;
+		try {
+			userRecord = fbAuth.createUserAsync(request).get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Successfully created new user in FBAUTH: "
+				+ userRecord.getUid());
+	}
+	
 	/*
 	 *  Create a new event in Firebase Database
 	 */
 	public void createNewEvent(Event event)
 	{
+		Map<String, Event> e = new HashMap<>();
+		e.put(encodeUserEmail(event.getCreator()), event);
+		eventsRef.setValueAsync(e);
 		
+		// Test values for data snapshots
+		Iterable<DataSnapshot> parent = events.getChildren();
+		for (DataSnapshot child : parent)
+		{
+			System.out.println("IM IN CREATENEWEVENT" + child.getKey());
+			Event ev = child.getValue(Event.class);
+			//SimpleInterval<Date> si = ev.getEventInterval();
+			System.out.println(ev.getCreator());
+			System.out.println(ev.getName());
+			System.out.println(ev.getType());
+			List<String> inv = ev.getInvitedEmails();
+			for (String s: inv)
+			{
+				System.out.println(s);
+			}
+			List<Date> dur = ev.getDuration();
+			for (Date d : dur)
+			{
+				System.out.println(d.toString());
+			}
+			//System.out.println(si.toString());
+		}		
 	}
 	
 	public static void main(String [] args) 
@@ -225,6 +309,9 @@ public class Server
 	}
 }
 
+/*
+ *  Client handler class to communicate with multiple client requests
+ */
 class ClientHandler extends Thread
 {
 	private Server server;
@@ -263,64 +350,47 @@ class ClientHandler extends Thread
 			{
 				// Right now, this just gets a JSON string
 				String fromClient = in.readUTF();
-				//String fromClient = in.readLine();
-				if (fromClient != null) {
-					System.out.println("FromClient: " + fromClient);
+//				String fromClient = in.readLine();
+//				if (fromClient != null) {
+//					System.out.println("FromClient: " + fromClient);
+//				}
+//				
+				// Parse JSON string to object
+				GsonBuilder gsonBuilder = new GsonBuilder();
+				gsonBuilder.registerTypeAdapter(Date.class, new DateDeserializer());
+				//Gson gson = new GsonBuilder().setPrettyPrinting().create();
+				Gson gson = gsonBuilder.create();
+				if (fromClient.contains("password"))
+				{
+					User user = gson.fromJson(fromClient, User.class);
+					// Test message
+					System.out.println("inside clienthandler run() " + 
+							user.getEmail() + " " + user.getPassword()
+							+ " " + user.getName());
+					
+					// Check if login credentials are right.
+					server.verifyUser(user);
+					// Create user object and send to server. Server will do the
+					// logic to create a user
+					server.createUser(user);	
 				}
 				
-				// Parse JSON string to object
-				Gson gson = new GsonBuilder().setPrettyPrinting().create();
-				User user = gson.fromJson(fromClient, User.class);
-				// test message
-				System.out.println("inside clienthandler run() " + 
-						user.getEmail() + " " + user.getPassword()
-						+ " " + user.getUserName());
+				if (fromClient.contains("creator"))
+				{
+					// Test message
+					System.out.println("inside clienthandler run()" +
+							fromClient);
+					Event event = gson.fromJson(fromClient, Event.class);
+					//event.setEventInterval();
+					server.createNewEvent(event);
+				}
 				
-				// Test to see if login credentials are right.
-				server.verifyUser(user);
-				// Create user object and send to server. Server will do the
-				// logic to create a user
-				//server.createUser(user);
-				
-				//server.createUser(user.getEmail(), user.getPassword(), user.getName());
-				
-//				// TODO : Need a way to differentiate between when client
-//				// sends create user info
-//				if (fromClient.contains("username"))
-//				{
-//					
-//				}
-				
-				// TODO : Need a way to differentiate between when client
-				// sends create event info
-				
-				
-				// TODO : Need a way to differentiate between when client
-				// sends update event info
-				
-				
-				// TODO : Need a way to differentiate between when client
-				// sends any other kind of json info
-				
-				
-				//Event event = gson.fromJson(fromClient, Event.class);
 			} 
 			catch (IOException ioe) 
 			{
 				System.out.println("in clienthandler.run() " + ioe.getMessage());
 				ioe.printStackTrace();
 			}
-			// Json object
-			// jsondata = new JSONObject()
-			// somestring = jsondata.getString()
-			// somestring.equals("request_connect") 
-			// logic here
-		}
-		
-	}
-
-	/* 
-	 *  Send message to client function
-	 */
-	
+		}	
+	}	
 }

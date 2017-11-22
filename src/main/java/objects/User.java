@@ -1,29 +1,33 @@
 package objects;
 
 import java.io.Serializable;
+import java.util.Set;
 
 public class User implements Serializable{
 	public static final long serialVersionUID = 1;
 	private String email;
 	private String password;
-	private String userName;
+	private String name;
+	private Set<Event> events;
 	
-	public User()
+	public User() { }
+	
+//	public User()
+//	{
+//		email = null;
+//		password = null;
+//		userName = null;
+//	}
+//	public User(String email, String password) {
+//		this.email = email;
+//		this.password = password;
+//	}
+//	
+	public User(String email, String password, String name) 
 	{
-		email = null;
-		password = null;
-		userName = null;
-	}
-	public User(String email, String password) {
 		this.email = email;
 		this.password = password;
-	}
-	
-	public User(String email, String password, String username) 
-	{
-		this.email = email;
-		this.password = password;
-		this.userName = username;
+		this.name = name;
 	}
 	
 	public String getEmail()
@@ -36,8 +40,8 @@ public class User implements Serializable{
 		return password;
 	}
 	
-	public String getUserName()
+	public String getName()
 	{
-		return userName;
+		return name;
 	}
 }
