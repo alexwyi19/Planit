@@ -278,7 +278,8 @@ public class Server
 	{
 		Map<String, Event> e = new HashMap<>();
 		e.put(encodeUserEmail(event.getCreator()), event);
-		eventsRef.push().setValueAsync(e);
+//		eventsRef.push().setValueAsync(e);
+		eventsRef.child(event.getName()).setValueAsync(event);
 		//eventsRef.child(event.getCreator()).setValueAsync(e);
 		
 		// Test values for data snapshots
@@ -323,6 +324,8 @@ public class Server
 					Map<String,Boolean> joined = ev.getJoinedEvent();
 					if(joined.get(name.split("@")[0])!=null){
 						joined.put(name.split("@")[0], true);
+						ev.setJoinedEvent(joined);
+						eventsRef.setValueAsync(ev);
 						return true;
 					}
 				}
@@ -334,8 +337,10 @@ public class Server
 	//given an event name it will return the event
 	public Event findEvent(String name) {
 		Event e=null;
-		Iterable<DataSnapshot> parent = events.getChildren();
-		for (DataSnapshot mid : parent)
+		System.out.println("Before get");
+//		Iterable<DataSnapshot> parent = events.getChildren();
+		System.out.println("after get");
+		for (DataSnapshot mid : events.getChildren())
 		{
 			Iterable<DataSnapshot> temp = ((DataSnapshot) mid).getChildren();
 			for(DataSnapshot child: temp) {
@@ -389,6 +394,9 @@ class ClientHandler extends Thread
 	
 	public void run() 
 	{
+//		server.findEvent("nameOfEvent");
+//		boolean val=server.joinEvent(server.findEvent("nameOfEvent"),"email1@usc.edu");
+//		System.out.println(val+ " FINISHED");
 		while (true) 
 		{
 			try 
