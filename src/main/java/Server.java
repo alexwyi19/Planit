@@ -310,6 +310,44 @@ public class Server
 			}
 		}		
 	}
+	
+	//will change the boolean from false to true if someone joins
+	public boolean joinEvent(Event event,String name) {
+		Iterable<DataSnapshot> parent = events.getChildren();
+		for (DataSnapshot mid : parent)
+		{
+			Iterable<DataSnapshot> temp = ((DataSnapshot) mid).getChildren();
+			for(DataSnapshot child: temp) {
+				Event ev = child.getValue(Event.class);
+				if(event == ev) {
+					Map<String,Boolean> joined = ev.getJoinedEvent();
+					if(joined.get(name.split("@")[0])!=null){
+						joined.put(name.split("@")[0], true);
+						return true;
+					}
+				}
+			}
+		}		
+		return false;
+	}
+	
+	//given an event name it will return the event
+	public Event findEvent(String name) {
+		Event e=null;
+		Iterable<DataSnapshot> parent = events.getChildren();
+		for (DataSnapshot mid : parent)
+		{
+			Iterable<DataSnapshot> temp = ((DataSnapshot) mid).getChildren();
+			for(DataSnapshot child: temp) {
+				Event ev = child.getValue(Event.class);
+				if(name.equals(ev.getName())) {
+					e=ev;
+				}
+			}
+		}
+		return e;
+	}
+	
 	public static void main(String [] args) 
 	{
 		Server server = new Server();
