@@ -8,7 +8,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.json.JSONObject;
@@ -104,12 +106,17 @@ public class ClientTest extends Thread {
 		String type = scan.nextLine();
 		
 		List<String> invEmails = new ArrayList();
+		Map<String,Boolean> joinedEvent = new HashMap<String,Boolean>();
 		System.out.println("invite email1:");
 		String invitedEmail1 = scan.nextLine();
 		invEmails.add(invitedEmail1);
+		joinedEvent.put(invitedEmail1.split("@")[0],false);
+//		joinedEvent.put(invitedEmail1,false);
 		System.out.println("invite email2:");
 		String invitedEmail2 = scan.nextLine();
 		invEmails.add(invitedEmail2);
+		joinedEvent.put(invitedEmail2.split("@")[0], false);
+//		joinedEvent.put(invitedEmail2, false);
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 		String date1 = "11/20/2017 08:00";
@@ -122,6 +129,11 @@ public class ClientTest extends Thread {
 		object.put("name", name);
 		object.put("type", type);
 		object.put("invitedEmails", invEmails);
+//		List<String> joined = new ArrayList();
+//		joined.add(null);
+//		object.put("joinedEvent",joined);
+		object.put("joinedEvent", joinedEvent);
+		
 		List<Date> dates = new ArrayList<>();
 		dates.add(d1);
 		dates.add(d2);

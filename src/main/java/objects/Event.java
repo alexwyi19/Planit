@@ -19,6 +19,25 @@ public class Event implements Serializable {
 	private SimpleInterval<Date> suggestedInterval;
 	private Map<String, SimpleInterval<Date>> availabilities;
 	private List<Date> duration;
+	private Map<String,Boolean> joinedEvent;
+	
+	
+
+
+	/**
+	 * @return the joinedEvent
+	 */
+	public Map<String, Boolean> getJoinedEvent() {
+		return joinedEvent;
+	}
+
+	/**
+	 * @param joinedEvent the joinedEvent to set
+	 */
+	public void setJoinedEvent(Map<String, Boolean> joinedEvent) {
+		this.joinedEvent = joinedEvent;
+	}
+
 	public List<Date> getDuration()
 	{
 		return duration;
@@ -28,12 +47,14 @@ public class Event implements Serializable {
 	
 	public Event(String creator, String name, String type, 
 			List<String> invitedEmails,
-			SimpleInterval<Date> eventInterval)
+			SimpleInterval<Date> eventInterval,
+			Map<String,Boolean> joinedEvent)
 	{
 		this.creator = creator;
 		this.name = name;
 		this.type = type;
 		this.invitedEmails = invitedEmails;
+		this.joinedEvent = joinedEvent;
 	//	this.eventInterval = eventInterval;
 	}
 	

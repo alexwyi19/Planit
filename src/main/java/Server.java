@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -277,32 +278,38 @@ public class Server
 	{
 		Map<String, Event> e = new HashMap<>();
 		e.put(encodeUserEmail(event.getCreator()), event);
-		eventsRef.setValueAsync(e);
+		eventsRef.push().setValueAsync(e);
+		//eventsRef.child(event.getCreator()).setValueAsync(e);
 		
 		// Test values for data snapshots
 		Iterable<DataSnapshot> parent = events.getChildren();
-		for (DataSnapshot child : parent)
+		for (DataSnapshot mid : parent)
 		{
-			System.out.println("IM IN CREATENEWEVENT" + child.getKey());
-			Event ev = child.getValue(Event.class);
-			//SimpleInterval<Date> si = ev.getEventInterval();
-			System.out.println(ev.getCreator());
-			System.out.println(ev.getName());
-			System.out.println(ev.getType());
-			List<String> inv = ev.getInvitedEmails();
-			for (String s: inv)
-			{
-				System.out.println(s);
+			Iterable<DataSnapshot> temp = ((DataSnapshot) mid).getChildren();
+			for(DataSnapshot child: temp) {
+				System.out.println("IM IN CREATENEWEVENT" + child.getKey());
+				Event ev = child.getValue(Event.class);
+				//SimpleInterval<Date> si = ev.getEventInterval();
+				System.out.println(ev.getCreator());
+				System.out.println(ev.getName());
+				System.out.println(ev.getType());
+				List<String> inv = ev.getInvitedEmails();
+				System.out.println("RIGHT BEFORE THE ERROR");
+				System.out.println(inv.size());
+				for (String s: inv)
+				{
+					System.out.println(s);
+				}
+				System.out.println("AFTER ERROR");
+				List<Date> dur = ev.getDuration();
+				for (Date d : dur)
+				{
+					System.out.println(d.toString());
+				}
+				//System.out.println(si.toString());
 			}
-			List<Date> dur = ev.getDuration();
-			for (Date d : dur)
-			{
-				System.out.println(d.toString());
-			}
-			//System.out.println(si.toString());
 		}		
 	}
-	
 	public static void main(String [] args) 
 	{
 		Server server = new Server();
@@ -355,6 +362,9 @@ class ClientHandler extends Thread
 //					System.out.println("FromClient: " + fromClient);
 //				}
 //				
+				
+				System.out.println("THIS IS FROM THE CLIENT:");
+				System.out.println(fromClient);
 				// Parse JSON string to object
 				GsonBuilder gsonBuilder = new GsonBuilder();
 				gsonBuilder.registerTypeAdapter(Date.class, new DateDeserializer());
@@ -384,7 +394,6 @@ class ClientHandler extends Thread
 					//event.setEventInterval();
 					server.createNewEvent(event);
 				}
-				
 			} 
 			catch (IOException ioe) 
 			{
