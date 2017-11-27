@@ -283,72 +283,93 @@ public class Server
 		//eventsRef.child(event.getCreator()).setValueAsync(e);
 		
 		// Test values for data snapshots
-		Iterable<DataSnapshot> parent = events.getChildren();
-		for (DataSnapshot mid : parent)
-		{
-			Iterable<DataSnapshot> temp = ((DataSnapshot) mid).getChildren();
-			for(DataSnapshot child: temp) {
-				System.out.println("IM IN CREATENEWEVENT" + child.getKey());
-				Event ev = child.getValue(Event.class);
-				//SimpleInterval<Date> si = ev.getEventInterval();
-				System.out.println(ev.getCreator());
-				System.out.println(ev.getName());
-				System.out.println(ev.getType());
-				List<String> inv = ev.getInvitedEmails();
-				System.out.println("RIGHT BEFORE THE ERROR");
-				System.out.println(inv.size());
-				for (String s: inv)
-				{
-					System.out.println(s);
-				}
-				System.out.println("AFTER ERROR");
-				List<Date> dur = ev.getDuration();
-				for (Date d : dur)
-				{
-					System.out.println(d.toString());
-				}
-				//System.out.println(si.toString());
-			}
-		}		
+//		Iterable<DataSnapshot> parent = events.getChildren();
+//		for (DataSnapshot mid : parent)
+//		{
+//			Iterable<DataSnapshot> temp = ((DataSnapshot) mid).getChildren();
+//			for(DataSnapshot child: temp) {
+//				System.out.println("IM IN CREATENEWEVENT" + child.getKey());
+//				Event ev = child.getValue(Event.class);
+//				//SimpleInterval<Date> si = ev.getEventInterval();
+//				System.out.println(ev.getCreator());
+//				System.out.println(ev.getName());
+//				System.out.println(ev.getType());
+//				List<String> inv = ev.getInvitedEmails();
+//				System.out.println("RIGHT BEFORE THE ERROR");
+//				System.out.println(inv.size());
+//				for (String s: inv)
+//				{
+//					System.out.println(s);
+//				}
+//				System.out.println("AFTER ERROR");
+//				List<Date> dur = ev.getDuration();
+//				for (Date d : dur)
+//				{
+//					System.out.println(d.toString());
+//				}
+//				//System.out.println(si.toString());
+//			}
+//		}		
 	}
 	
 	//will change the boolean from false to true if someone joins
 	public boolean joinEvent(Event event,String name) {
-		Iterable<DataSnapshot> parent = events.getChildren();
-		for (DataSnapshot mid : parent)
+//		Iterable<DataSnapshot> parent = events.getChildren();
+//		for (DataSnapshot mid : parent)
+//		{
+//			Iterable<DataSnapshot> temp = ((DataSnapshot) mid).getChildren();
+//			for(DataSnapshot child: temp) {
+//				Event ev = child.getValue(Event.class);
+//				if(event == ev) {
+//					Map<String,Boolean> joined = ev.getJoinedEvent();
+//					if(joined.get(name.split("@")[0])!=null){
+//						joined.put(name.split("@")[0], true);
+//						ev.setJoinedEvent(joined);
+//						eventsRef.setValueAsync(ev);
+//						return true;
+//					}
+//				}
+//			}
+//		}		
+//		return false;
+		
+		// Dont need to do findEvent here because it was already sent in from
+		// line 418 but wasnt sure why you wanted a boolean returned from this function
+		Event e = findEvent(event.getName());
+		if (e != null)
 		{
-			Iterable<DataSnapshot> temp = ((DataSnapshot) mid).getChildren();
-			for(DataSnapshot child: temp) {
-				Event ev = child.getValue(Event.class);
-				if(event == ev) {
-					Map<String,Boolean> joined = ev.getJoinedEvent();
-					if(joined.get(name.split("@")[0])!=null){
-						joined.put(name.split("@")[0], true);
-						ev.setJoinedEvent(joined);
-						eventsRef.setValueAsync(ev);
-						return true;
-					}
-				}
-			}
-		}		
+			// Manually update database directly through events reference
+			eventsRef.child(event.getName()).child("joinedEvent").child(name).setValueAsync(true);
+			return true;
+		}
+		
 		return false;
 	}
 	
 	//given an event name it will return the event
 	public Event findEvent(String name) {
-		Event e=null;
-		System.out.println("Before get");
-//		Iterable<DataSnapshot> parent = events.getChildren();
-		System.out.println("after get");
-		for (DataSnapshot mid : events.getChildren())
+//		Event e=null;
+//		System.out.println("Before get");
+////		Iterable<DataSnapshot> parent = events.getChildren();
+//		System.out.println("after get");
+//		for (DataSnapshot mid : events.getChildren())
+//		{
+//			Iterable<DataSnapshot> temp = ((DataSnapshot) mid).getChildren();
+//			for(DataSnapshot child: temp) {
+//				Event ev = child.getValue(Event.class);
+//				if(name.equals(ev.getName())) {
+//					e=ev;
+//				}
+//			}
+//		}
+//		return e;
+		
+		Event e = null;
+		Iterable<DataSnapshot> parent = events.getChildren();
+		for (DataSnapshot child : parent)
 		{
-			Iterable<DataSnapshot> temp = ((DataSnapshot) mid).getChildren();
-			for(DataSnapshot child: temp) {
-				Event ev = child.getValue(Event.class);
-				if(name.equals(ev.getName())) {
-					e=ev;
-				}
-			}
+			System.out.println("IM IN HERE" + child.getKey());
+			e = child.getValue(Event.class);
 		}
 		return e;
 	}
@@ -394,9 +415,13 @@ class ClientHandler extends Thread
 	
 	public void run() 
 	{
-//		server.findEvent("nameOfEvent");
+		Event e = server.findEvent("tylerevent");
+		System.out.println(e.getName());
 //		boolean val=server.joinEvent(server.findEvent("nameOfEvent"),"email1@usc.edu");
 //		System.out.println(val+ " FINISHED");
+		// "gg" is just name of dummy email I entered
+		Boolean val = server.joinEvent(e, "gg");
+		System.out.println(val+ " FINISHED");
 		while (true) 
 		{
 			try 
