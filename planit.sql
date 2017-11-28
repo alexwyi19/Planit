@@ -21,6 +21,9 @@ CREATE TABLE Events(
     url VARCHAR(50) NOT NULL,
     joinedEventID INT(11) NOT NULL,
     invitedEmailID INT(11) NOT NULL,
+    duration INT(10) NOT NULL,
+    isRecurring VARCHAR (20) NOT NULL,
+    isPublic VARCHAR(20) NOT NULL,
     FOREIGN KEY fk3(userID) REFERENCES Users(userID)
     -- FOREIGN KEY fk4(joinedEventID) REFERENCES joinedEvent(joinedEventID)
 -- 	FOREIGN KEY fk5(invitedEmailID) REFERENCES invitedEmails(invitedEmailID)
@@ -28,10 +31,10 @@ CREATE TABLE Events(
 
 CREATE TABLE joinedEvent(
 	joinedEventID INT(11) PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(20) NOT NULL,
-    joined VARCHAR(20) NOT NULL,
+	userID INT(11) NOT NULL,
     eventID INT(11) NOT NULL,
-    FOREIGN KEY fk1(eventID) REFERENCES Events(eventID)
+    FOREIGN KEY fk1(eventID) REFERENCES Events(eventID),
+    FOREIGN KEY fk3(userID) REFERENCES Users(userID)
 );
 
 CREATE TABLE invitedEmails(
