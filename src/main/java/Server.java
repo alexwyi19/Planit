@@ -375,7 +375,7 @@ class ClientHandler extends Thread
 					System.out.println(e.getUrl());
 					
 				}
-				if(type.equals("joinevent")) {
+				if(type.equals("updateevent")) {
 					
 				}
 //				
