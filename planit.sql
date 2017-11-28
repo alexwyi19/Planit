@@ -19,12 +19,13 @@ CREATE TABLE Events(
     creator VARCHAR(50) NOT NULL,
     userID INT(11) NOT NULL,
     url VARCHAR(50) NOT NULL,
-    joinedEventID INT(11) NOT NULL,
-    invitedEmailID INT(11) NOT NULL,
+    -- --REMOVE THESE
+--     joinedEventID INT(11) NOT NULL,
+--     invitedEmailID INT(11) NOT NULL,    
     duration INT(10) NOT NULL,
     isRecurring VARCHAR (20) NOT NULL,
     isPublic VARCHAR(20) NOT NULL,
-    FOREIGN KEY fk3(userID) REFERENCES Users(userID)
+    FOREIGN KEY fk1(userID) REFERENCES Users(userID)
     -- FOREIGN KEY fk4(joinedEventID) REFERENCES joinedEvent(joinedEventID)
 -- 	FOREIGN KEY fk5(invitedEmailID) REFERENCES invitedEmails(invitedEmailID)
 );
@@ -33,7 +34,7 @@ CREATE TABLE joinedEvent(
 	joinedEventID INT(11) PRIMARY KEY AUTO_INCREMENT,
 	userID INT(11) NOT NULL,
     eventID INT(11) NOT NULL,
-    FOREIGN KEY fk1(eventID) REFERENCES Events(eventID),
+    FOREIGN KEY fk2(eventID) REFERENCES Events(eventID),
     FOREIGN KEY fk3(userID) REFERENCES Users(userID)
 );
 
@@ -41,7 +42,7 @@ CREATE TABLE invitedEmails(
 	invitedEmailID INT(11) PRIMARY KEY AUTO_INCREMENT,
     emails VARCHAR(50) NOT NULL,
     eventID INT(11) NOT NULL,
-    FOREIGN KEY fk2(eventID) REFERENCES Events(eventID)
+    FOREIGN KEY fk4(eventID) REFERENCES Events(eventID)
 );
 
 CREATE TABLE availabilityIntervals(
@@ -49,7 +50,7 @@ CREATE TABLE availabilityIntervals(
     start VARCHAR(50) NOT NULL,
     end VARCHAR(50) NOT NULL,
     eventID INT(11) NOT NULL,
-    FOREIGN KEY fk1(eventID) REFERENCES Events(eventID)
+    FOREIGN KEY fk5(eventID) REFERENCES Events(eventID)
     
 );
 
@@ -58,5 +59,5 @@ CREATE TABLE availabilities(
     userID INT(11) NOT NULL,
     start VARCHAR(50) NOT NULL,
     end VARCHAR(50) NOT NULL,
-	FOREIGN KEY fk3(userID) REFERENCES Users(userID)
+	FOREIGN KEY fk6(userID) REFERENCES Users(userID)
 );
