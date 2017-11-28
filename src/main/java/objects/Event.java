@@ -10,7 +10,7 @@ public class Event implements Serializable {
 	private String duration;
 	private Boolean isRecurring;
 	private Boolean isPublic;
-	private String url;
+	private String URL;
 	private User creator;
 	private List<String> invitedEmails;
 	private List<User> joinedUsers;
@@ -79,11 +79,11 @@ public class Event implements Serializable {
 	}
 
 	public String getUrl() {
-		return url;
+		return URL;
 	}
 
 	public void setUrl(String url) {
-		this.url = url;
+		this.URL = url;
 	}
 
 	public User getCreator() {

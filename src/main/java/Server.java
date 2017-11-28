@@ -15,6 +15,9 @@ import java.util.Vector;
 
 import org.json.JSONObject;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import objects.Event;
 import objects.User;
 /*
@@ -321,33 +324,55 @@ class ClientHandler extends Thread
 				
 				System.out.println("THIS IS FROM THE CLIENT:");
 				System.out.println(obj);
+				
 				// Parse JSON string to object
-//				GsonBuilder gsonBuilder = new GsonBuilder();
+				//GsonBuilder gsonBuilder = new GsonBuilder();
 //				gsonBuilder.registerTypeAdapter(Date.class, new DateDeserializer());
 				//Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//				Gson gson = gsonBuilder.create();
+				//Gson gson = gsonBuilder.create();
 
-				
+				Gson gson = new Gson();
 				String type = obj.getString("type");
 				if(type.equals("login")) {
 					System.out.println("IN THIS FUNCTION");
 					User u = server.verifyUser(obj.getString("username"), obj.getString("password"));
 					System.out.println("FINISHED FUNCTION");
-					System.out.println(u.getName()+ " " + u.getEmail());
+//					System.out.println(u.getName()+ " " + u.getEmail());
+//					
+					
+		
+					
 					//WE NEED TO SEND USER U
 				}
 				if(type.equals("signup")) {
 					User u =server.createUser(obj.getString("username"),obj.getString("password"),obj.getString("email"));
-					System.out.println(u.getName()+ " " + u.getEmail());
+					//System.out.println(u.getName()+ " " + u.getEmail());
 					//WE NEED TO SEND USER U
+					String response = gson.toJson(u);
+					System.out.println("Response: " + response);
+//					StandardCharsets.UTF_8
+					byte [] b = response.getBytes("UTF8");
+					int len = b.length;
+					System.out.println("Len: " + len);
+					out.writeInt(len);
+					out.flush();
+					out.write(b);
+					out.flush();
 				}
 				if(type.equals("getevents")) {
-//					Event e = server.getEvents(obj.getInt("id"));
+					//Event e = server.getEvents(obj.getInt("id"));
+			
 				}
 				if(type.equals("getuser")) {
 					User u = server.getUser(obj.getInt("id"));
 				}
 				if(type.equals("createevent")) {
+					System.out.println(obj.toString());
+					Event e = gson.fromJson(obj.get("event").toString(), Event.class);
+					//System.out.println(obj.toString());
+					System.out.println(e.getId());
+					System.out.println(e.getName());
+					System.out.println(e.getUrl());
 					
 				}
 				if(type.equals("joinevent")) {
