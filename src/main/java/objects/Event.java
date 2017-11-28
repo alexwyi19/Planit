@@ -20,6 +20,7 @@ public class Event implements Serializable {
 	private Map<String, SimpleInterval<Date>> availabilities;
 	private List<Date> duration;
 	private Map<String,Boolean> joinedEvent;
+	private int eventID;
 	
 	
 
@@ -48,7 +49,8 @@ public class Event implements Serializable {
 	public Event(String creator, String name, String type, 
 			List<String> invitedEmails,
 			SimpleInterval<Date> eventInterval,
-			Map<String,Boolean> joinedEvent)
+			Map<String,Boolean> joinedEvent,
+			int eventID)
 	{
 		this.creator = creator;
 		this.name = name;
@@ -56,6 +58,7 @@ public class Event implements Serializable {
 		this.invitedEmails = invitedEmails;
 		this.joinedEvent = joinedEvent;
 	//	this.eventInterval = eventInterval;
+		this.eventID=eventID;
 	}
 	
 	/*
@@ -124,6 +127,20 @@ public class Event implements Serializable {
 			availabilities = new HashMap<String, SimpleInterval<Date>>();
 		}
 		availabilities.put(email, availability);
+	}
+
+	/**
+	 * @return the eventID
+	 */
+	public int getEventID() {
+		return eventID;
+	}
+
+	/**
+	 * @param eventID the eventID to set
+	 */
+	public void setEventID(int eventID) {
+		this.eventID = eventID;
 	}
 	
 //	public String getTestString()

@@ -9,6 +9,7 @@ public class User implements Serializable{
 	private String password;
 	private String name;
 	private Set<Event> events;
+	private int userID;
 	
 	public User() { }
 	
@@ -23,11 +24,12 @@ public class User implements Serializable{
 //		this.password = password;
 //	}
 //	
-	public User(String email, String password, String name) 
+	public User(String email, String password, String name,int userID) 
 	{
 		this.email = email;
 		this.password = password;
 		this.name = name;
+		this.userID=userID;
 	}
 	
 	public String getEmail()
@@ -44,4 +46,19 @@ public class User implements Serializable{
 	{
 		return name;
 	}
+
+	/**
+	 * @return the userID
+	 */
+	public int getUserID() {
+		return userID;
+	}
+
+	/**
+	 * @param userID the userID to set
+	 */
+	public void setUserID(int userID) {
+		this.userID = userID;
+	}
+	
 }
