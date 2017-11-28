@@ -16,6 +16,7 @@ import java.util.Vector;
 import org.json.JSONObject;
 
 import objects.Event;
+import objects.User;
 /*
  * Server class to accept multithreaded sockets. Uses 
  * ClientHandler class within this file to communicate with 
@@ -181,9 +182,54 @@ public class Server
 		Event e=null;
 		ResultSet rEvent = null;
 		Statement sEvent = null;
-		
+		try {
+			sEvent=conn.createStatement();
+			rEvent = sEvent.executeQuery("SELECT * FROM Events WHERE eventID='"+id+"';");
+			
+			
+		}catch(SQLException sqle) {
+			System.out.println("sqle: "+sqle.getMessage());
+		}finally {
+			try {
+				if (rEvent!=null) {
+					rEvent.close();
+				}
+				if(sEvent!=null) {
+					sEvent.close();
+				}
+			}catch (SQLException sqle) {
+				System.out.println("sqle: "+ sqle.getMessage());
+			}
+		}
 		return e;
 	}
+	
+	public User getUser(int id) {
+		User u=null;
+		ResultSet rUser = null;
+		Statement sUser = null;
+		try {
+			sUser=conn.createStatement();
+			rUser = sUser.executeQuery("SELECT * FROM Users WHERE userID='"+id+"';");
+			u = new User(rUser.getString("email"),rUser.getString("password"),rUser.getString("username"),rUser.getInt("userID")); 
+			
+		}catch(SQLException sqle) {
+			System.out.println("sqle: "+sqle.getMessage());
+		}finally {
+			try {
+				if (rUser!=null) {
+					rUser.close();
+				}
+				if(sUser!=null) {
+					sUser.close();
+				}
+			}catch (SQLException sqle) {
+				System.out.println("sqle: "+ sqle.getMessage());
+			}
+		}
+		return u;
+	}
+	
 	public static void main(String [] args) 
 	{
 		Server server = new Server();
@@ -278,7 +324,7 @@ class ClientHandler extends Thread
 					Event e = server.getEvent(obj.getInt("id"));
 				}
 				if(type.equals("getuser")) {
-					
+					User u = server.getUser(obj.getInt("id"));
 				}
 				if(type.equals("getcreatedevents")) {
 					
