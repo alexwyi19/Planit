@@ -51,10 +51,6 @@ CREATE TABLE availabilityIntervals(
     end VARCHAR(50) NOT NULL,
     eventID INT(11) NOT NULL,
     FOREIGN KEY fk5(eventID) REFERENCES Events(eventID)
-<<<<<<< HEAD
-=======
-    
->>>>>>> c14d633eacc157c966dd24d38f9349e42a031e39
 );
 
 CREATE TABLE availabilities(
@@ -62,12 +58,8 @@ CREATE TABLE availabilities(
     userID INT(11) NOT NULL,
     start VARCHAR(50) NOT NULL,
     end VARCHAR(50) NOT NULL,
-<<<<<<< HEAD
     eventID INT(11) NOT NULL,
 	FOREIGN KEY fk6(userID) REFERENCES Users(userID),
     FOREIGN KEY fk7(eventID) REFERENCES Events(eventID)
 );
-=======
-	FOREIGN KEY fk6(userID) REFERENCES Users(userID)
-);
->>>>>>> c14d633eacc157c966dd24d38f9349e42a031e39
+
