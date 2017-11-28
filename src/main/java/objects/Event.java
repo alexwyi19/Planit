@@ -1,13 +1,14 @@
 package objects;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Event implements Serializable {
 	public static final long serialVersionUID = 1;
-	private int id; 
+	private int identifier; 
 	private String name;
-	private String duration;
+	private int duration;
 	private Boolean isRecurring;
 	private Boolean isPublic;
 	private String URL;
@@ -19,6 +20,25 @@ public class Event implements Serializable {
 	
 	public Event() {}
 	
+	
+public Event(int identifier, String name, int duration, Boolean isRecurring, Boolean isPublic, String uRL,
+			User creator, List<String> invitedEmails, List<User> joinedUsers, List<Interval> availabilityIntervals,
+			List<Availability> availabilities) {
+		super();
+		this.identifier = identifier;
+		this.name = name;
+		this.duration = duration;
+		this.isRecurring = isRecurring;
+		this.isPublic = isPublic;
+		URL = uRL;
+		this.creator = creator;
+		this.invitedEmails = invitedEmails;
+		this.joinedUsers = joinedUsers;
+		this.availabilityIntervals = availabilityIntervals;
+		this.availabilities = availabilities;
+	}
+
+
 // Custom toString method if we need later on
 //	@Override
 //	public String toString() {
@@ -37,13 +57,14 @@ public class Event implements Serializable {
 //				.toString();
 //	}
 
+
 	// Auto-generated getters/setters, change if needed
 	public int getId() {
-		return id;
+		return identifier;
 	}
 
 	public void setId(int id) {
-		this.id = id;
+		this.identifier = id;
 	}
 
 	public String getName() {
@@ -54,11 +75,11 @@ public class Event implements Serializable {
 		this.name = name;
 	}
 
-	public String getDuration() {
+	public int getDuration() {
 		return duration;
 	}
 
-	public void setDuration(String duration) {
+	public void setDuration(int duration) {
 		this.duration = duration;
 	}
 

@@ -10,6 +10,14 @@ public class EventList implements Serializable {
 	private List<Event> invitedEvents;
 	private List<Event> createdEvents;
 	
+	public EventList() {}
+	
+	public EventList(List<Event> createdEvents2, List<Event> invitedEvents2, List<Event> joinedEvents2) {
+		// TODO Auto-generated constructor stub
+		createdEvents = createdEvents2;
+		invitedEvents = invitedEvents2;
+		joinedEvents = joinedEvents2;
+	}
 	public List<Event> getCreatedEvents() {
 		return createdEvents;
 	}

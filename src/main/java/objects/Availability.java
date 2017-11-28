@@ -8,6 +8,13 @@ public class Availability implements Serializable {
 	private User user;
 	private Interval interval;
 	
+	public Availability() {}
+	
+	public Availability(User userAva, Interval interval2) {
+		// TODO Auto-generated constructor stub
+		user = userAva;
+		interval = interval2;
+	}
 	public User getUser() {
 		return user;
 	}

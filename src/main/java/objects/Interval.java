@@ -5,19 +5,19 @@ import java.io.Serializable;
 public class Interval implements Serializable {
 	
 	public static final long serialVersionUID = 1;
-	private String start;
-	private String duration;
+	private long start;
+	private int duration;
 	
-	public String getStart() {
+	public long getStart() {
 		return start;
 	}
-	public void setStart(String start) {
+	public void setStart(long start) {
 		this.start = start;
 	}
-	public String getDuration() {
+	public int getDuration() {
 		return duration;
 	}
-	public void setDuration(String duration) {
+	public void setDuration(int duration) {
 		this.duration = duration;
 	}
 }
