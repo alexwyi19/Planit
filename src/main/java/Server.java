@@ -212,7 +212,6 @@ public class Server
 			sUser=conn.createStatement();
 			rUser = sUser.executeQuery("SELECT * FROM Users WHERE userID='"+id+"';");
 			u = new User(rUser.getString("email"),rUser.getString("password"),rUser.getString("username"),rUser.getInt("userID")); 
-			
 		}catch(SQLException sqle) {
 			System.out.println("sqle: "+sqle.getMessage());
 		}finally {

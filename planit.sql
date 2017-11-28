@@ -33,9 +33,27 @@ CREATE TABLE joinedEvent(
     eventID INT(11) NOT NULL,
     FOREIGN KEY fk1(eventID) REFERENCES Events(eventID)
 );
+
 CREATE TABLE invitedEmails(
 	invitedEmailID INT(11) PRIMARY KEY AUTO_INCREMENT,
     emails VARCHAR(50) NOT NULL,
     eventID INT(11) NOT NULL,
     FOREIGN KEY fk2(eventID) REFERENCES Events(eventID)
+);
+
+CREATE TABLE availabilityIntervals(
+	availabilityIntervalID INT(11) PRIMARY KEY AUTO_INCREMENT,
+    start VARCHAR(50) NOT NULL,
+    end VARCHAR(50) NOT NULL,
+    eventID INT(11) NOT NULL,
+    FOREIGN KEY fk1(eventID) REFERENCES Events(eventID)
+    
+);
+
+CREATE TABLE availabilities(
+	availabilityID INT(11) PRIMARY KEY AUTO_INCREMENT,
+    userID INT(11) NOT NULL,
+    start VARCHAR(50) NOT NULL,
+    end VARCHAR(50) NOT NULL,
+	FOREIGN KEY fk3(userID) REFERENCES Users(userID)
 );
