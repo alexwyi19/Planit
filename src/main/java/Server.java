@@ -16,7 +16,6 @@ import java.util.Vector;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import objects.Event;
 import objects.User;
@@ -339,9 +338,6 @@ class ClientHandler extends Thread
 					System.out.println("FINISHED FUNCTION");
 //					System.out.println(u.getName()+ " " + u.getEmail());
 //					
-					
-		
-					
 					//WE NEED TO SEND USER U
 				}
 				if(type.equals("signup")) {
