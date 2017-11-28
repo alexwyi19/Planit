@@ -92,7 +92,7 @@ public class Server
 			}
 		}
 	}
-	public void verifyUser(String username, String password) {
+	public User verifyUser(String username, String password) {
 		System.out.println("verifying user: " + username + " password: " + password);
 		try {
 			rs = st.executeQuery("SELECT * FROM Users WHERE username='"+username+"';");
@@ -100,8 +100,10 @@ public class Server
 			{
 				if (rs.getString("password").equals(password))
 				{
+					User u = new User(rs.getString("email"),rs.getString("password"),rs.getString("username"),rs.getInt("userID"));
 					System.out.println("Verifying: " + username + " w/ given password: " + password);
 					System.out.println("GOOD LOGIN INFO");
+					return u;
 				}
 				else
 				{
@@ -115,16 +117,23 @@ public class Server
 		}catch(SQLException sqle) {
 			System.out.println("sqle: "+sqle.getMessage());
 		}
+		return null;
 	}
-	public void createUser(String username, String password,String email) {
+	public User createUser(String username, String password,String email) {
+		User u=null;
 		System.out.println("Creating: " + email + " " + username+" "+password);
 		ResultSet rUser=null;
 		ResultSet rEmail=null;
+		ResultSet rID = null;
 		Statement sUser = null;
 		Statement sEmail =null;
+		Statement sID = null;
+		Statement s = null;
 		try {
 			sUser = conn.createStatement();
 			sEmail = conn.createStatement();
+			sID = conn.createStatement();
+			s=conn.createStatement();
 			System.out.println("HERE1");
 			rUser = sUser.executeQuery("SELECT * FROM Users WHERE username='"+username+"';");
 			System.out.println("HERE2");
@@ -133,15 +142,20 @@ public class Server
 			if(rUser.next()){
 				System.out.println("HERE4");
 				System.out.println("Already existing username");
-				return;
 			}
 			else if(rEmail.next()) {
 				System.out.println("HERE6");
 				System.out.println("Already existing email");
-				return;
 			}
 			else {
-				st.execute("INSERT INTO Users (username,password,email) VALUES ('"+username+"','"+password+"','"+email+"');");
+				System.out.println("HERE7");
+				s.execute("INSERT INTO Users (username,password,email) VALUES ('"+username+"','"+password+"','"+email+"');");
+				System.out.println("HERE8");
+				rID = sID.executeQuery("SELECT * FROM Users WHERE username='"+username+"';");
+				rID.next();
+				System.out.println("HERE9");
+				u = new User(email,password,username, rID.getInt("userID"));
+				System.out.println("HERE10");
 			}
 		}catch(SQLException sqle) {
 			System.out.println("sqle: "+sqle.getMessage());
@@ -159,50 +173,54 @@ public class Server
 				if(sEmail!=null) {
 					sEmail.close();
 				}
+				if(rID!=null) {
+					rID.close();
+				}
+				if(sID!=null) {
+					sID.close();
+				}
+				if(s!=null) {
+					s.close();
+				}
+				
 			}catch (SQLException sqle) {
 				System.out.println("sqle: "+ sqle.getMessage());
 			}
 		}
-//		if (!emailExists(email) && !userExists(username))
-//		{
-//			emailsRef.child(email).setValueAsync(email);
-//			usersRef.child(username).setValueAsync(user);
-//			createUserFbAuth(user);
-//		}
-//		else 
-//		{
-//			System.out.println("EMAIL OR USERNAME EXISTS");
-//		}
+		System.out.println("HERE11");
+		return u;
+
 		
 	}
 	public void createNewEvent(Event event) {
 		
 	}
-	public Event getEvent(int id) {
-		Event e=null;
-		ResultSet rEvent = null;
-		Statement sEvent = null;
-		try {
-			sEvent=conn.createStatement();
-			rEvent = sEvent.executeQuery("SELECT * FROM Events WHERE eventID='"+id+"';");
-			
-			
-		}catch(SQLException sqle) {
-			System.out.println("sqle: "+sqle.getMessage());
-		}finally {
-			try {
-				if (rEvent!=null) {
-					rEvent.close();
-				}
-				if(sEvent!=null) {
-					sEvent.close();
-				}
-			}catch (SQLException sqle) {
-				System.out.println("sqle: "+ sqle.getMessage());
-			}
-		}
-		return e;
-	}
+	
+//	public Event getEvent(int id) {
+//		Event e=null;
+//		ResultSet rEvent = null;
+//		Statement sEvent = null;
+//		try {
+//			sEvent=conn.createStatement();
+//			rEvent = sEvent.executeQuery("SELECT * FROM Events WHERE eventID='"+id+"';");
+//			
+//			
+//		}catch(SQLException sqle) {
+//			System.out.println("sqle: "+sqle.getMessage());
+//		}finally {
+//			try {
+//				if (rEvent!=null) {
+//					rEvent.close();
+//				}
+//				if(sEvent!=null) {
+//					sEvent.close();
+//				}
+//			}catch (SQLException sqle) {
+//				System.out.println("sqle: "+ sqle.getMessage());
+//			}
+//		}
+//		return e;
+//	}
 	
 	public User getUser(int id) {
 		User u=null;
@@ -313,26 +331,21 @@ class ClientHandler extends Thread
 				String type = obj.getString("type");
 				if(type.equals("login")) {
 					System.out.println("IN THIS FUNCTION");
-					server.verifyUser(obj.getString("username"), obj.getString("password"));
+					User u = server.verifyUser(obj.getString("username"), obj.getString("password"));
 					System.out.println("FINISHED FUNCTION");
+					System.out.println(u.getName()+ " " + u.getEmail());
+					//WE NEED TO SEND USER U
 				}
 				if(type.equals("signup")) {
-					server.createUser(obj.getString("username"),obj.getString("password"),obj.getString("email"));
+					User u =server.createUser(obj.getString("username"),obj.getString("password"),obj.getString("email"));
+					System.out.println(u.getName()+ " " + u.getEmail());
+					//WE NEED TO SEND USER U
 				}
-				if(type.equals("getevent")) {
-					Event e = server.getEvent(obj.getInt("id"));
+				if(type.equals("getevents")) {
+//					Event e = server.getEvents(obj.getInt("id"));
 				}
 				if(type.equals("getuser")) {
 					User u = server.getUser(obj.getInt("id"));
-				}
-				if(type.equals("getcreatedevents")) {
-					
-				}
-				if(type.equals("getjoinedevents")) {
-					
-				}
-				if(type.equals("getinvitedevents")) {
-					
 				}
 				if(type.equals("createevent")) {
 					
