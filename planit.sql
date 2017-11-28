@@ -18,6 +18,7 @@ CREATE TABLE Events(
     name VARCHAR(20) NOT NULL,
     creator VARCHAR(50) NOT NULL,
     userID INT(11) NOT NULL,
+    url VARCHAR(50) NOT NULL,
     FOREIGN KEY fk3(userID) REFERENCES Users(userID)
 );
 

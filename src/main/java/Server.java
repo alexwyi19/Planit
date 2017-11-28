@@ -177,6 +177,13 @@ public class Server
 	public void createNewEvent(Event event) {
 		
 	}
+	public Event getEvent(int id) {
+		Event e=null;
+		ResultSet rEvent = null;
+		Statement sEvent = null;
+		
+		return e;
+	}
 	public static void main(String [] args) 
 	{
 		Server server = new Server();
@@ -266,6 +273,27 @@ class ClientHandler extends Thread
 				}
 				if(type.equals("signup")) {
 					server.createUser(obj.getString("username"),obj.getString("password"),obj.getString("email"));
+				}
+				if(type.equals("getevent")) {
+					Event e = server.getEvent(obj.getInt("id"));
+				}
+				if(type.equals("getuser")) {
+					
+				}
+				if(type.equals("getcreatedevents")) {
+					
+				}
+				if(type.equals("getjoinedevents")) {
+					
+				}
+				if(type.equals("getinvitedevents")) {
+					
+				}
+				if(type.equals("createevent")) {
+					
+				}
+				if(type.equals("joinevent")) {
+					
 				}
 //				
 //				if (fromClient.contains("password"))
